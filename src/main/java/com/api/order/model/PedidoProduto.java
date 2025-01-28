@@ -2,6 +2,7 @@ package com.api.order.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -9,6 +10,7 @@ import lombok.NoArgsConstructor;
 @Table(name="PEDIDO_PRODUTO")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class PedidoProduto {
 
     @Id

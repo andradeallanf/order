@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @JsonInclude
 public class PedidoFiltroDto {
     private Long cdProduto;
+    private Long cdPedidoExterno;
     private String status;
     private LocalDateTime dtInicial;
     private LocalDateTime dtFinal;

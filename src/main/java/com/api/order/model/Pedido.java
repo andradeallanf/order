@@ -3,6 +3,7 @@ package com.api.order.model;
 import com.api.order.dto.PedidoDto;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Table(name="PEDIDO")
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 public class Pedido {
 
     @Id
@@ -38,4 +40,6 @@ public class Pedido {
     @JsonManagedReference
     private List<PedidoProduto> itens = new ArrayList<>();
 
+    @Column(name = "VL_TOTAL")
+    private BigDecimal vlTotalPedido;
 }

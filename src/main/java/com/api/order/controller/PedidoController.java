@@ -2,13 +2,17 @@ package com.api.order.controller;
 
 import com.api.order.dto.PedidoDto;
 import com.api.order.dto.PedidoFiltroDto;
+import com.api.order.exceptions.PedidoValidationException;
+import com.api.order.message.producer.KafkaProducerMessage;
 import com.api.order.service.PedidoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -19,6 +23,9 @@ public class PedidoController {
 
     @Autowired
     private PedidoService pedidoService;
+
+    @Autowired
+    private KafkaProducerMessage kafkaProducerMessage;
 
     @Operation(
             summary = "Cria um novo pedido",
@@ -32,8 +39,11 @@ public class PedidoController {
     })
     @PostMapping("/criar-pedido/")
     public ResponseEntity<PedidoDto> criarPedido(@RequestBody PedidoDto pedidoDto) {
-        PedidoDto pedidoCriado = pedidoService.criarPedido(pedidoDto);
-        return ResponseEntity.ok(pedidoCriado);
+        if (pedidoDto.getCdPedidoExterno() == null) {
+            throw new PedidoValidationException("Pedido externo não informado");
+        }
+        kafkaProducerMessage.sendMessage(pedidoDto, "pedido");
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @Operation(
@@ -48,8 +58,12 @@ public class PedidoController {
     })
     @GetMapping
     public ResponseEntity<PedidoDto> getPedidoById(Long cdPedido) {
-        PedidoDto pedido = pedidoService.findPedidoById(cdPedido);
-        return ResponseEntity.ok(pedido);
+        try {
+            PedidoDto pedido = pedidoService.findPedidoById(cdPedido);
+            return ResponseEntity.ok(pedido);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 
     @Operation(

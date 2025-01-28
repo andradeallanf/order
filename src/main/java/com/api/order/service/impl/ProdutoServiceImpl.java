@@ -22,6 +22,9 @@ public class ProdutoServiceImpl implements ProdutoService {
 
     @Override
     public ProdutoDto criarProduto(ProdutoDto produtoDto) {
+        if (produtoDto.getNmProduto() == null) {
+            throw new RuntimeException("Nome do produto é obrigatório");
+        }
         Produto produto = produtoMapper.toEntity(produtoDto);
         produto.setDtCadastro(LocalDateTime.now());
         Produto produtoSalvo = produtoRepository.save(produto);
